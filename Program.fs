@@ -16,7 +16,7 @@
     | _ -> false
 
   let getUserChoice () : string =
-    printf("Choose r, p, s (q to quit): ")
+    printf("Choose r, p, s: ")
     System.Console.ReadLine()
     
   let compareChoices (userChoice: string, computerChoice: string) : string =
@@ -74,10 +74,6 @@
       roundNum <- roundNum + 1
     else
       printf "Bad input, try again.\n"
-
-  // game loop
-  while keepPlaying do
-    rpsRound()
 
 [<EntryPoint>]
 let main args = 

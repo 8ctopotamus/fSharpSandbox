@@ -15,7 +15,7 @@ let isValidChoice (str : string) : bool =
   | _ -> false
 
 let getUserChoice () : string =
-  printf("Choose r, p, s (q to quit): ")
+  printf("Choose r, p, s: ")
   System.Console.ReadLine()
   
 let compareChoices (userChoice: string, computerChoice: string) : string =
