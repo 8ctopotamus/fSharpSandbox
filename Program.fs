@@ -1,6 +1,6 @@
 ﻿module RPS =
   let choices = ["r"; "p"; "s"]
-  let mutable roundNum = 0
+  let mutable roundNum = 1
   let mutable keepPlaying = true
   let mutable wins = 0
   let mutable losses = 0
@@ -15,10 +15,14 @@
     | "r" | "p" | "s" -> true
     | _ -> false
 
+  let getUserChoice () : string =
+    printf("Choose r, p, s (q to quit): ")
+    System.Console.ReadLine()
+    
   let compareChoices (userChoice: string, computerChoice: string) : string =
-    if (System.String.Compare(userChoice, "r") > -1 && System.String.Compare(computerChoice, "s") > -1) || (System.String.Compare(userChoice, "p") > -1 && System.String.Compare(computerChoice, "r") > -1) || (System.String.Compare(userChoice, "s") > -1 && System.String.Compare(computerChoice, "p") > -1) then
+    if (System.String.Compare(userChoice, "r") = 0 && System.String.Compare(computerChoice, "s") = 0) || (System.String.Compare(userChoice, "p") = 0 && System.String.Compare(computerChoice, "r") = 0) || (System.String.Compare(userChoice, "s") = 0 && System.String.Compare(computerChoice, "p") = 0) then
       "win"
-    elif System.String.Compare(userChoice, computerChoice) > -1 then 
+    elif System.String.Compare(userChoice, computerChoice) = 0 then 
       "tie"
     else
       "lose"
@@ -32,7 +36,7 @@
       losses <- losses + 1
 
   let playAgainPrompt () : bool =
-    printf("Want to keep playing? [y/n]")
+    printf("Want to play again? [y/n]\n")
     let answer = System.Console.ReadLine()
     match answer with
     | "n" -> false
@@ -51,24 +55,29 @@
         | "" -> false
         | _ -> true
     if gameOver then
+      printf "========================\n"
       printf "GAME OVER. You %s!\n" msg
+      printf "========================\n"
       keepPlaying <- playAgainPrompt()
 
   let rpsRound () =
-    printf "===================================\n"
-    printf "ROUND %i" 
-    printf("Choose 'r', 'p', or 's']: ")
-    let userChoice = System.Console.ReadLine()
+    printf "-----------------------------------\n"
+    printf "ROUND %i\n" roundNum 
+    let userChoice = getUserChoice()
     let computerChoice = getComputerChoice()
     if isValidChoice(userChoice) then 
       let result = compareChoices(userChoice, computerChoice)
-      printf "You chose: %s\nComputer chose: %s\n" userChoice computerChoice
-      printf "-----------------------------------\n"
+      printf "You: %s | Computer: %s\n" userChoice computerChoice
       updateScore(result)
-      printf "Score:\nWins: %i Tie: %i Losses: %i\n" wins ties losses
-      printf "===================================\n"
+      printf "Score: Wins: %i | Tie: %i | Losses: %i\n" wins ties losses
       checkGameOver()
       roundNum <- roundNum + 1
+    else
+      printf "Bad input, try again.\n"
+
+  // game loop
+  while keepPlaying do
+    rpsRound()
 
 [<EntryPoint>]
 let main args = 

@@ -16,12 +16,8 @@ let isValidChoice (str : string) : bool =
 
 let getUserChoice () : string =
   printf("Choose r, p, s (q to quit): ")
-  let choice = System.Console.ReadLine()
-
-  if System.String.Compare(choice, "exit") = 0 then
-    System.Environment.Exit(0)
-  choice
-
+  System.Console.ReadLine()
+  
 let compareChoices (userChoice: string, computerChoice: string) : string =
   if (System.String.Compare(userChoice, "r") = 0 && System.String.Compare(computerChoice, "s") = 0) || (System.String.Compare(userChoice, "p") = 0 && System.String.Compare(computerChoice, "r") = 0) || (System.String.Compare(userChoice, "s") = 0 && System.String.Compare(computerChoice, "p") = 0) then
     "win"
@@ -58,20 +54,21 @@ let checkGameOver () =
       | "" -> false
       | _ -> true
   if gameOver then
+    printf "========================\n"
     printf "GAME OVER. You %s!\n" msg
+    printf "========================\n"
     keepPlaying <- playAgainPrompt()
 
 let rpsRound () =
+  printf "-----------------------------------\n"
   printf "ROUND %i\n" roundNum 
   let userChoice = getUserChoice()
   let computerChoice = getComputerChoice()
   if isValidChoice(userChoice) then 
     let result = compareChoices(userChoice, computerChoice)
-    printf "You: %s Computer: %s\n" userChoice computerChoice
-    printf "-----------------------------------\n"
+    printf "You: %s | Computer: %s\n" userChoice computerChoice
     updateScore(result)
-    printf "Score:\nWins: %i Tie: %i Losses: %i\n" wins ties losses
-    printf "===================================\n"
+    printf "Score: Wins: %i | Tie: %i | Losses: %i\n" wins ties losses
     checkGameOver()
     roundNum <- roundNum + 1
   else
