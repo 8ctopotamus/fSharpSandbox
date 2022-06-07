@@ -1,31 +1,70 @@
 ﻿module RPS =
-  let choices = ["r"; "p"; "s"]
+  type Choice =
+  | Rock
+  | Paper
+  | Scissors
+
+  type RoundResult =
+  | UserWins
+  | UserLoses
+  | Tie
+
+  module Choice =
+    open System.Linq
+    let parse (input: string) : Result<Choice,string> =
+      match input.ToUpper().First() with
+      | 'R' -> Ok Rock
+      | 'P' -> Ok Paper
+      | 'S' -> Ok Scissors
+      | _ -> Error input
+
+    let compare (user: Choice) (computer: Choice) : RoundResult =
+      match (user, computer) with
+      | (Rock,Scissors)
+      | (Paper,Rock)
+      | (Scissors,Paper) -> UserWins
+      | (u,c) when u = c -> Tie
+      | _ -> UserLoses
+
+
+  // let choices = ["r"; "p"; "s"]
   let mutable roundNum = 1
   let mutable keepPlaying = true
-  let mutable wins = 0
-  let mutable losses = 0
-  let mutable ties = 0
+  // let mutable wins = 0
+  // let mutable losses = 0
+  // let mutable ties = 0
 
-  let getComputerChoice () : string =
-    let rand = new System.Random()
-    choices.[rand.Next(choices.Length)]
+  [<AutoOpen>]
+  module RPSRand =
+    let private rand = new System.Random()
+    let getComputerChoice () : Choice =
+      match rand.Next 2 with
+      | 0 -> Rock
+      | 1 -> Paper
+      | 2 -> Scissors
+      | x -> failwithf "Critical Error: Random should only generate values from 0 to 2, we received %i" x
 
-  let isValidChoice (str : string) : bool =
-    match str with
-    | "r" | "p" | "s" -> true
-    | _ -> false
+  // let isValidChoice (str : string) : bool =
+  //   match str with
+  //   | "r" | "p" | "s" -> true
+  //   | _ -> false
 
   let getUserChoice () : string =
     printf("Choose r, p, s: ")
     System.Console.ReadLine()
-    
-  let compareChoices (userChoice: string, computerChoice: string) : string =
-    if (System.String.Compare(userChoice, "r") = 0 && System.String.Compare(computerChoice, "s") = 0) || (System.String.Compare(userChoice, "p") = 0 && System.String.Compare(computerChoice, "r") = 0) || (System.String.Compare(userChoice, "s") = 0 && System.String.Compare(computerChoice, "p") = 0) then
-      "win"
-    elif System.String.Compare(userChoice, computerChoice) = 0 then 
-      "tie"
-    else
-      "lose"
+
+  type Player = Player of lifeCount:int
+
+  type Score = {
+    User: Player
+    Computer: Player }
+
+  module Score =
+    let init () : Score = {
+      User = Player 3
+      Computer = Player 3 }
+    let update (score: Score) (result: RoundResult) : Score = 
+      score
 
   let updateScore (result: string) =
     if System.String.Compare(result, "win") > -1 then
@@ -63,17 +102,18 @@
   let rpsRound () =
     printf "-----------------------------------\n"
     printf "ROUND %i\n" roundNum 
-    let userChoice = getUserChoice()
+    let userChoice = () |> getUserChoice |> Choice.parse
     let computerChoice = getComputerChoice()
-    if isValidChoice(userChoice) then 
-      let result = compareChoices(userChoice, computerChoice)
-      printf "You: %s | Computer: %s\n" userChoice computerChoice
+    match userChoice with
+    | Ok userChoice' ->
+      let result = Choice.compare userChoice' computerChoice
+      printf "You: %A | Computer: %A\n" userChoice' computerChoice
       updateScore(result)
       printf "Score: Wins: %i | Tie: %i | Losses: %i\n" wins ties losses
       checkGameOver()
       roundNum <- roundNum + 1
-    else
-      printf "Bad input, try again.\n"
+    | Error badInput ->
+      printfn "Bad input '%s', try again." badInput
 
 [<EntryPoint>]
 let main args = 
